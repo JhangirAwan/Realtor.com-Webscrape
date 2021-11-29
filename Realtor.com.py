@@ -2,11 +2,27 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from tkinter import *
+from tkinter.filedialog import askdirectory
 import time
 from tkinter.messagebox import showinfo
+from tkinter import messagebox
 
+directory1=0
 
 def start():
+    
+    try:
+        zip=int(e1.get())
+    except:
+        zip=0
+    if not directory1:
+        messagebox.showerror("Error", "No download directory selected")
+        return
+
+    elif not zip:
+        messagebox.showerror("Error", "No zipcode entered")
+        return
+
     headers = {
         'authority': 'www.realtor.com',
         'cache-control': 'max-age=0',
@@ -25,7 +41,7 @@ def start():
         'cookie': 'split=n; split_tcv=160; __vst=e6f0cb42-51f8-470c-85ba-492ba9e26d35; __ssn=d4358bf0-c9dc-4ba3-868f-12aa91cb118c; __ssnstarttime=1636570706; __split=70; AMCVS_8853394255142B6A0A4C98A4%40AdobeOrg=1; G_ENABLED_IDPS=google; srchID=fb7374ebe8e24cbaa70b20cda9373426; criteria=pg%3D1%26sprefix%3D%252Frealestateandhomes-search%26area_type%3Dpostal_code%26search_type%3Dpostal_code%26city%3DRichmond%26postal_code%3D77469%26zip%3D77469%26state_code%3DTX%26state_id%3DTX%26lat%3D29.492986%26long%3D-95.706919%26county_fips%3D48157%26county_fips_multi%3D48157%26loc%3D77469%252C%2520Richmond%252C%2520TX%26locSlug%3D77469; user_activity=return; last_ran=-1; last_ran_threshold=1636570732648; AMCV_8853394255142B6A0A4C98A4%40AdobeOrg=-1124106680%7CMCIDTS%7C18942%7CMCMID%7C75564293837333409987083810661096784126%7CMCAID%7CNONE%7CMCOPTOUT-1636577933s%7CNONE%7CvVersion%7C5.2.0; g_state={"i_p":1636577938658,"i_l":1}',
         'if-none-match': '"eab64-qYulCq7WkZXcmAsVAVZ7nmQzAdk"',
     }
-    zip=int(e1.get())
+    
     # zip=input("Please enter the zip code you wish to search:")
     base_url="https://www.realtor.com/realestateandhomes-search/"
     r=requests.get(base_url+str(zip), headers=headers)
@@ -89,10 +105,18 @@ def start():
 
     df=pd.DataFrame(l)
     df
-    filename1=str(zip) +" Properties" +".xlsx"
+    filename1=directory1+"/"+str(zip) +" Properties" +".xlsx"
     df.to_excel(filename1)
     t1.insert(END, len(df.index))
     showinfo(message='The Process is completed!')
+
+
+def selDirectory():
+    global directory1
+    directory1=0
+    directory1 = askdirectory(title='Select Folder')
+    print(directory1)
+    print(type(directory1))
 
 window = Tk()
 window.geometry("800x400")
@@ -114,9 +138,14 @@ e1=Entry(window, textvariable=title_text)
 e1.grid(row=0, column=1)
 
 b1 = Button(window, text = "Download", command = start, font="Raleway", bg="gray16", fg="white", height=2, width=15)
-b1.grid(row=1,column=1)
+b1.grid(row=1,column=1,padx=0, pady=50)
 
+b2 = Button(window, text = "Select download directory", command = selDirectory, font="Raleway", bg="gray16", fg="white", height=4, width=15, wraplength=80, justify=CENTER)
+b2.grid(row=1,column=0,padx=0, pady=50)
 
 
 
 window.mainloop()
+
+
+ 
